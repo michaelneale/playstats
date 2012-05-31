@@ -1,5 +1,6 @@
 
 import java.util.{TimerTask, Timer}
+import management.ManagementFactory
 import play.api.GlobalSettings
 import play.api.mvc.{Action, RequestHeader}
 import play.api.mvc.Results._
@@ -19,14 +20,45 @@ object Global extends GlobalSettings {
     requestCounter.increment()
     if (request.uri == "/_stats") {
       val echo = Action { request =>
-          Ok("requestCountPerMinute=" + requestCounter.rate +
-             "\nerrorCountPerMinute=" + errorCounter.rate)
+          Ok(statsReport)
        }
       Some(echo)
     } else {
       super.onRouteRequest(request)
     }
   }
+
+
+  def statsReport = {
+    val memory = ManagementFactory.getMemoryMXBean
+    val nonHeap = memory.getNonHeapMemoryUsage
+    val heap = memory.getHeapMemoryUsage
+    val threads = ManagementFactory.getThreadMXBean
+    val classes = ManagementFactory.getClassLoadingMXBean
+
+    line("requestCountPerMinute", requestCounter.rate) +
+    line("errorCountPerMinute", errorCounter.rate) +
+    line("totalMemory", Runtime.getRuntime.totalMemory()) +
+    line("freeMemory", Runtime.getRuntime.freeMemory()) +
+    line("maxMemory", Runtime.getRuntime.maxMemory()) +
+    line("committedNonHeap", nonHeap.getCommitted) +
+    line("maxNonHeap", nonHeap.getMax) +
+    line("usedNonHeap", nonHeap.getUsed) +
+    line("maxHeap", heap.getMax) +
+    line("committedHeap", heap.getCommitted) +
+    line("userHeap", heap.getUsed) +
+    line("currentThreadCPUTime", threads.getCurrentThreadCpuTime) +
+    line("currentThreadUserTime", threads.getCurrentThreadUserTime) +
+    line("daemonThreadCount", threads.getDaemonThreadCount) +
+    line("peakThreadCount", threads.getPeakThreadCount) +
+    line("threadCount", threads.getThreadCount) +
+    line("totalLoadedClassesCount", classes.getTotalLoadedClassCount) +
+    line("loadedClassesCount", classes.getLoadedClassCount) +
+    line("loadedUnloadedClassesCount", classes.getUnloadedClassCount)
+  }
+
+  def line(item: String, value: Double) = item + "=" + value + "\n"
+
 
   override def onError(request: RequestHeader, ex: Throwable) = {
     errorCounter.increment()
