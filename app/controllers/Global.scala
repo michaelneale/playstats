@@ -36,24 +36,25 @@ object Global extends GlobalSettings {
     val threads = ManagementFactory.getThreadMXBean
     val classes = ManagementFactory.getClassLoadingMXBean
 
-    line("requestCountPerMinute", requestCounter.rate) +
-    line("errorCountPerMinute", errorCounter.rate) +
+    line("request_requestCount", requestCounter.rate) +
+    line("request_errorCount", errorCounter.rate) +
     line("totalMemory", Runtime.getRuntime.totalMemory()) +
     line("freeMemory", Runtime.getRuntime.freeMemory()) +
     line("maxMemory", Runtime.getRuntime.maxMemory()) +
-    line("committedNonHeap", nonHeap.getCommitted) +
-    line("maxNonHeap", nonHeap.getMax) +
-    line("usedNonHeap", nonHeap.getUsed) +
-    line("maxHeap", heap.getMax) +
-    line("committedHeap", heap.getCommitted) +
-    line("userHeap", heap.getUsed) +
-    line("currentThreadCPUTime", threads.getCurrentThreadCpuTime) +
+    line("memory_nonheap_committed", nonHeap.getCommitted) +
+    line("memory_nonheap_max", nonHeap.getMax) +
+    line("memory_nonheap_used", nonHeap.getUsed) +
+    line("memory_heap_max", heap.getMax) +
+    line("memory_heap_committed", heap.getCommitted) +
+    line("memory_heap_used", heap.getUsed) +
+    line("threads_cputime", threads.getCurrentThreadCpuTime) +
     line("currentThreadUserTime", threads.getCurrentThreadUserTime) +
     line("daemonThreadCount", threads.getDaemonThreadCount) +
-    line("peakThreadCount", threads.getPeakThreadCount) +
-    line("threadCount", threads.getThreadCount) +
+    line("threads_peakCount", threads.getPeakThreadCount) +
+    line("threads_count", threads.getThreadCount) +
     line("totalLoadedClassesCount", classes.getTotalLoadedClassCount) +
-    line("loadedClassesCount", classes.getLoadedClassCount) +
+    line("totalStartedThreadCount", threads.getTotalStartedThreadCount) +
+    line("classes_loaded", classes.getLoadedClassCount) +
     line("loadedUnloadedClassesCount", classes.getUnloadedClassCount)
   }
 
