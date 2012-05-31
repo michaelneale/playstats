@@ -1,0 +1,8 @@
+Play stats module - collecting stats on errors and requests, and more.
+=====================================
+
+Provides this data via /_stats url when you include this global in your project (as a dependency).
+
+Counts requests, errors, and provides data on the heap, and threads.
+
+
