@@ -5,4 +5,7 @@ Provides this data via /_stats url when you include this global in your project 
 
 Counts requests, errors, and provides data on the heap, and threads.
 
+Example for creating a play2 plugin/module that I followed:
+http://www.objectify.be/wordpress/?p=363
+
 
