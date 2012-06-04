@@ -1,4 +1,5 @@
 
+import akka.actor.{Props, ActorSystem, Actor}
 import java.util.{TimerTask, Timer}
 import management.ManagementFactory
 import play.api.GlobalSettings
@@ -12,6 +13,8 @@ import play.api.mvc.Results._
  * @author michael neale
  */
 object Global extends GlobalSettings {
+
+
 
   val requestCounter = new ReqCounter
   val errorCounter = new ReqCounter
@@ -68,15 +71,38 @@ object Global extends GlobalSettings {
 
 
   class ReqCounter(val timer: Timer) {
+
+    val INC = 1
+    val RES = 2
+    val RESET = 3
+    val system = ActorSystem("statsSystem")
+
     var currentRate = 0.0
-    var requestCount = 0
+
+    class Counter extends Actor {
+      var requestCount = 0
+      def receive = {
+        case INC => {
+          requestCount = requestCount + 1
+          if (currentRate < 1) {
+            currentRate = requestCount
+          }
+        }
+        case RESET => {
+          currentRate = requestCount
+          requestCount = 0
+        }
+      }
+    }
+
+
+    val counter = system.actorOf(Props(new Counter), name = "statsCounter")
 
     def this() = {
       this(new Timer)
       timer.scheduleAtFixedRate(new TimerTask {
         def run() {
-          currentRate = requestCount
-          requestCount = 0
+          counter ! RESET
         }
       }, 0, 60000)
     }
@@ -84,10 +110,10 @@ object Global extends GlobalSettings {
 
 
     def increment() {
-      requestCount = requestCount + 1
+      counter ! INC
     }
 
-    def rate = if (currentRate > 0) currentRate else requestCount
+    def rate = currentRate
   }
 }
 
